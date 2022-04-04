@@ -1,0 +1,16 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+DIR=$(dirname "$(readlink -f "$0")")
+user=${1:-www-data}
+
+# shellcheck source=utils.sh
+# shellcheck disable=SC1091
+source "$DIR"/utils.sh
+
+cd "$DIR"
+run_as "git pull origin master" "$user"
+run_as "composer install --no-dev -n" "$user"
+run_as "$DIR/cake passbolt migrate --backup" "$user"
+run_as "$DIR/cake cache clear_all" "$user"
